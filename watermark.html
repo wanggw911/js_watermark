@@ -6,10 +6,6 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>证件照水印</title>
-    <script>
-        let text = `仅供 xxx 使用`;
-        let inputImage = `data:image/jpeg;base64,Base64已编码内容`;
-    </script>
     <style>
         html,
         body {
@@ -121,7 +117,6 @@
             width: 20%;
             font-size: 14px;
             color: #666;
-
         }
 
         .item.active {
@@ -180,7 +175,6 @@
             height: 2px;
             background-color: #e5e5e5;
             border-radius: 2px;
-
         }
 
         .tips {
@@ -256,7 +250,7 @@
                     <div class="content">
                         <input type="file" name="file" id="file" class="inputfile" onchange="selectPic(this)" />
                         <div class="chooseButton">
-                            <label for="file" class='btn btn-success'>选择图片</label>
+                            <label id="selectPicLabel" for="file" class='btn btn-success'>选择图片</label>
                         </div>
                     </div>
                 </li>
@@ -265,7 +259,7 @@
                         水印文字
                     </div>
                     <div class="content input">
-                        <input id="textInput" type="text" placeholder="请输入文本" name="text" value="仅供 xxx 使用" onchange="textChanged(this)">
+                        <input id="textInput" type="text" placeholder="请输入文本" name="text" value="仅供 xxx验证 使用" onchange="textChanged(this)">
                     </div>
                 </li>
                 <li>
@@ -320,13 +314,8 @@
         </div>
     </main>
     <script>
+        let text = `仅供 xxx验证 使用`;
         let waterMarker;
-        const img = new Image();
-        img.src = inputImage;
-        img.onload = (e) => {
-            waterMarker = new WaterMarker(img, text);
-            waterMarker.init();
-        };
 
         class WaterMarker {
 
@@ -400,6 +389,11 @@
                 this._drawText();
             }
 
+            drawContent(img) {
+                this.img = img;
+                this._drawText();
+            }
+            
             _resetCanvas() {
                 this.context.setTransform(1, 0, 0, 1, 0, 0);
                 this.context.globalAlpha = 1;
@@ -556,23 +550,26 @@
         }
 
        function selectPic() {
-            var reads= new FileReader();
-            f=document.getElementById('file').files[0];
+            var reads = new FileReader();
+            f = document.getElementById('file').files[0];
             reads.readAsDataURL(f);
             reads.onload=function (e) {
-                //document.getElementById("show").src=this.result;
                 const img = new Image();
                 img.src = this.result;
                 img.onload = (e) => {
-                    waterMarker = new WaterMarker(img, text);
-                    waterMarker.init();
-                };
+                    if (waterMarker) {
+                        waterMarker.drawContent(img);
+                    }
+                    else {
+                        var label = document.getElementById("selectPicLabel");
+                        label.innerText = "更换图片";
+                        
+                        waterMarker = new WaterMarker(img, text);
+                        waterMarker.init();
+                    }
+                }
             };
         }
-
-        
-
-        
 
     </script>
 </body>
