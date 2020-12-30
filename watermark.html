@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>证件照水印</title>
     <script>
-        let text = `text`;
+        let text = `仅供 xxx 使用`;
         let inputImage = `data:image/jpeg;base64,Base64已编码内容`;
     </script>
     <style>
@@ -22,12 +22,10 @@
             -webkit-font-smoothing: antialiased;
         }
 
-
         #main {
             margin: 0 auto;
             max-width: 500px;
             padding: 10px;
-
         }
 
         .canvas {
@@ -40,7 +38,6 @@
             display: block;
             box-shadow: 0 0 10px 10px rgba(182, 166, 166, 0.3);
         }
-
 
         .settings-panel {
             background-color: #fff;
@@ -208,6 +205,27 @@
             width: 80%;
             margin: 0 auto;
         }
+
+        .inputfile {
+            opacity: 0;
+            position:absolute;clip:rect(0 0 0 0);
+        }
+
+        .btn {
+            color: #f3f3f3;
+            font-size: 15px;
+        }
+
+        .chooseButton {
+            width: 80px;
+            height: 30px;
+            border-radius: 5px;
+            background: #4cAF50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
     </style>
 </head>
 
@@ -220,10 +238,21 @@
             <ul class="settings-item">
                 <li>
                     <div class="label">
+                        选择图片
+                    </div>
+                    <div class="content">
+                        <input type="file" name="file" id="file" class="inputfile" onchange="selectPic(this)" />
+                        <div class="chooseButton">
+                            <label for="file" class='btn btn-success'>选择图片</label>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="label">
                         水印文字
                     </div>
                     <div class="content input">
-                        <input type="text" placeholder="请输入文本" name="text" value="仅供xxx使用">
+                        <input id="textInput" type="text" placeholder="请输入文本" name="text" value="仅供 xxx 使用" onchange="textChanged(this)">
                     </div>
                 </li>
                 <li>
@@ -356,11 +385,6 @@
                 this._drawText();
             }
 
-
-
-
-
-
             _resetCanvas() {
                 this.context.setTransform(1, 0, 0, 1, 0, 0);
                 this.context.globalAlpha = 1;
@@ -401,7 +425,6 @@
             }
 
             _bindEvent() {
-
                 window.onerror = (e) => {
                     alert(e)
                 }
@@ -463,7 +486,6 @@
 
             };
 
-
             _toggleColorElementsActive(input = false, color = '') {
                 this.colorInput.parentNode.classList.toggle('active', input);
 
@@ -478,7 +500,6 @@
                     }
                 }
             }
-
 
             _valueChange(prop, color = false) {
                 return (event) => {
@@ -496,6 +517,24 @@
             }
         };
 
+       function selectPic() {
+            var reads= new FileReader();
+            f=document.getElementById('file').files[0];
+            reads.readAsDataURL(f);
+            reads.onload=function (e) {
+                //document.getElementById("show").src=this.result;
+                const img = new Image();
+                img.src = this.result;
+                img.onload = (e) => {
+                    waterMarker = new WaterMarker(img, text);
+                    waterMarker.init();
+                };
+            };
+        }
+
+        function textChanged() {
+            text = document.getElementById("textInput").value;
+        }
 
     </script>
 </body>
